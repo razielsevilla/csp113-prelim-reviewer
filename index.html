@@ -1245,7 +1245,7 @@ D) (Nothing is printed)
             if (ansMatch) {
                 const lines = ansMatch[1].split('\n');
                 lines.forEach(line => {
-                    const m = line.trim().match(/^(\d+)\.\s+([A-D])\s+\((.*?)\)$/);
+                    const m = line.trim().match(/^(\d+)\.\s+([A-D])\s+\((.*)\)/);
                     if (m) {
                         const qId = parseInt(m[1]);
                         const q = data.questions.find(q => q.id === qId);
