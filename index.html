@@ -224,6 +224,7 @@
         <div class="nav-tabs" id="assessmentTabs">
             <div class="tab active" onclick="switchAssessment(1)">Assessment 1 (Module 1-4)</div>
             <div class="tab" onclick="switchAssessment(2)">Assessment 2 (Food Delivery)</div>
+            <div class="tab" onclick="switchAssessment(3)">Assessment 3 (Library)</div>
         </div>
 
         <div id="quiz-container">
@@ -894,9 +895,323 @@ D) (Nothing is printed)
 10. D (The controller updates the underlying model data, but .updateView() is never explicitly called in the main method, so nothing is sent to the console 18, 19, 21.)
     </script>
 
+    <script type="text/markdown" id="raw-a3">Here is a third practice set! For this one, I have adapted the codebase to fit an Online Library Management System, which is another case problem discussed in your module 1. This context covers configurations for late fees (Singleton), handling different types of user limits (Factory), notifying users when books become available (Observer), and updating catalog inventory (MVC).
+
+***
+### The Unified Base Code: Library Management System
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+// ==========================================
+// 1. SINGLETON PATTERN
+// ==========================================
+class LibraryConfigManager {
+    private LibraryConfigManager() {
+        System.out.println("Library Config Initialized");
+    }
+    private static class SingletonHelper {
+        private static final LibraryConfigManager INSTANCE = new LibraryConfigManager();
+    }
+    public static LibraryConfigManager getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+    public String getLibraryName() {
+        return "City Central Library";
+    }
+    public double getLateFee() {
+        return 15.0;
+    }
+}
+
+// ==========================================
+// 2. FACTORY PATTERN
+// ==========================================
+interface Membership {
+    void showPrivileges();
+}
+class StudentMember implements Membership {
+    public void showPrivileges() {
+        System.out.println("Student: 5 books allowed.");
+    }
+}
+class FacultyMember implements Membership {
+    public void showPrivileges() {
+        System.out.println("Faculty: 10 books allowed.");
+    }
+}
+class PublicMember implements Membership {
+    public void showPrivileges() {
+        System.out.println("Public: 2 books allowed.");
+    }
+}
+class MembershipFactory {
+    public static Membership createMembership(String type) {
+        if (type.equalsIgnoreCase("STUDENT")) return new StudentMember();
+        if (type.equalsIgnoreCase("FACULTY")) return new FacultyMember();
+        if (type.equalsIgnoreCase("PUBLIC")) return new PublicMember();
+        return null;
+    }
+}
+
+// ==========================================
+// 3. OBSERVER PATTERN
+// ==========================================
+interface CatalogObserver {
+    void update(String bookAlert);
+}
+interface CatalogSubject {
+    void registerObserver(CatalogObserver o);
+    void removeObserver(CatalogObserver o);
+    void notifyObservers();
+}
+class BookTracker implements CatalogSubject {
+    private List observers = new ArrayList<>();
+    private String alertMessage;
+    public void registerObserver(CatalogObserver o) {
+        observers.add(o);
+    }
+    public void removeObserver(CatalogObserver o) {
+        observers.remove(o);
+    }
+    public void notifyObservers() {
+        for (CatalogObserver o : observers) {
+            o.update(alertMessage);
+        }
+    }
+    public void setAlert(String alertMessage) {
+        this.alertMessage = alertMessage;
+        notifyObservers();
+    }
+}
+class UserApp implements CatalogObserver {
+    private String userName;
+    public UserApp(String name) {
+        this.userName = name;
+    }
+    public void update(String alertMessage) {
+        System.out.println(userName + "'s App: " + alertMessage);
+    }
+}
+class AdminConsole implements CatalogObserver {
+    public void update(String alertMessage) {
+        System.out.println("Admin Console: " + alertMessage);
+    }
+}
+
+// ==========================================
+// 4. MODEL-VIEW-CONTROLLER (MVC) PATTERN
+// ==========================================
+class Book {
+    private String title;
+    private int copies;
+    public Book(String title, int copies) {
+        this.title = title;
+        this.copies = copies;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public int getCopies() {
+        return copies;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public void setCopies(int copies) {
+        this.copies = copies;
+    }
+}
+class BookView {
+    public void displayBook(String title, int copies) {
+        System.out.println("Catalog -> Title: " + title + " | Copies: " + copies);
+    }
+}
+class BookController {
+    private Book model;
+    private BookView view;
+    public BookController(Book model, BookView view) {
+        this.model = model;
+        this.view = view;
+    }
+    public void setBookTitle(String title) {
+        model.setTitle(title);
+    }
+    public void setBookCopies(int copies) {
+        model.setCopies(copies);
+    }
+    public void updateView() {
+        view.displayBook(model.getTitle(), model.getCopies());
+    }
+}
+```
+
+***
+### Tracing Assessment: 10 Questions
+Instructions: Determine the exact output printed to the console based on the unified codebase above.
+
+**Question 1**
+```java
+public static void main(String[] args) {
+    LibraryConfigManager config = LibraryConfigManager.getInstance();
+    System.out.println("Fee: P" + config.getLateFee());
+}
+```
+A) Fee: P15.0
+B) Library Config Initialized
+C) Library Config Initialized Fee: P15.0
+D) Compilation Error
+
+**Question 2**
+```java
+public static void main(String[] args) {
+    LibraryConfigManager c1 = LibraryConfigManager.getInstance();
+    LibraryConfigManager c2 = LibraryConfigManager.getInstance();
+    System.out.println(c2.getLibraryName());
+}
+```
+A) Library Config Initialized Library Config Initialized City Central Library
+B) Library Config Initialized City Central Library
+C) City Central Library
+D) NullPointerException
+
+**Question 3**
+```java
+public static void main(String[] args) {
+    Membership m = MembershipFactory.createMembership("faculty");
+    m.showPrivileges();
+}
+```
+A) Faculty: 10 books allowed.
+B) NullPointerException
+C) Compilation Error
+D) Faculty: 5 books allowed.
+
+**Question 4**
+```java
+public static void main(String[] args) {
+    Membership m1 = MembershipFactory.createMembership("ALUMNI");
+    if(m1 == null) {
+        System.out.println("Invalid Membership Type");
+    } else {
+        m1.showPrivileges();
+    }
+}
+```
+A) NullPointerException
+B) Alumni: 2 books allowed.
+C) Invalid Membership Type
+D) Public: 2 books allowed.
+
+**Question 5**
+```java
+public static void main(String[] args) {
+    Membership m1 = MembershipFactory.createMembership("PUBLIC");
+    Membership m2 = MembershipFactory.createMembership("STUDENT");
+    m2.showPrivileges();
+    m1.showPrivileges();
+}
+```
+A) Public: 2 books allowed. Student: 5 books allowed.
+B) Student: 5 books allowed. Public: 2 books allowed.
+C) Student: 10 books allowed. Public: 2 books allowed.
+D) NullPointerException
+
+**Question 6**
+```java
+public static void main(String[] args) {
+    BookTracker tracker = new BookTracker();
+    CatalogObserver app = new UserApp("David");
+    tracker.registerObserver(app);
+    tracker.setAlert("Harry Potter is now available!");
+}
+```
+A) Harry Potter is now available!
+B) David's App: Harry Potter is now available!
+C) Admin Console: Harry Potter is now available!
+D) Compilation Error
+
+**Question 7**
+```java
+public static void main(String[] args) {
+    BookTracker tracker = new BookTracker();
+    CatalogObserver admin = new AdminConsole();
+    tracker.setAlert("System Maintenance at Midnight");
+    tracker.registerObserver(admin);
+    tracker.setAlert("New books added to catalog");
+}
+```
+A) Admin Console: System Maintenance at Midnight Admin Console: New books added to catalog
+B) Admin Console: System Maintenance at Midnight
+C) Admin Console: New books added to catalog
+D) NullPointerException
+
+**Question 8**
+```java
+public static void main(String[] args) {
+    BookTracker tracker = new BookTracker();
+    CatalogObserver user1 = new UserApp("Emma");
+    CatalogObserver admin = new AdminConsole();
+    tracker.registerObserver(user1);
+    tracker.registerObserver(admin);
+    tracker.removeObserver(user1);
+    tracker.setAlert("Overdue notices sent");
+}
+```
+A) Admin Console: Overdue notices sent
+B) Emma's App: Overdue notices sent Admin Console: Overdue notices sent
+C) Emma's App: Overdue notices sent
+D) Compilation Error
+
+**Question 9**
+```java
+public static void main(String[] args) {
+    Book book = new Book("Design Patterns", 2);
+    BookView view = new BookView();
+    BookController ctrl = new BookController(book, view);
+    ctrl.updateView();
+    ctrl.setBookCopies(5);
+}
+```
+A) Catalog -> Title: Design Patterns | Copies: 5
+B) Catalog -> Title: Design Patterns | Copies: 2 Catalog -> Title: Design Patterns | Copies: 5
+C) Catalog -> Title: Design Patterns | Copies: 2
+D) NullPointerException
+
+**Question 10**
+```java
+public static void main(String[] args) {
+    Book book = new Book("Clean Code", 3);
+    BookView view = new BookView();
+    BookController ctrl = new BookController(book, view);
+    ctrl.setBookCopies(1);
+    ctrl.updateView();
+    ctrl.setBookCopies(0);
+    ctrl.updateView();
+}
+```
+A) Catalog -> Title: Clean Code | Copies: 1 Catalog -> Title: Clean Code | Copies: 0
+B) Catalog -> Title: Clean Code | Copies: 3 Catalog -> Title: Clean Code | Copies: 0
+C) Catalog -> Title: Clean Code | Copies: 0
+D) (Nothing is printed)
+
+***
+### Answer Key
+1. C (The Singleton's private constructor is called upon the very first getInstance() call, printing its initialization message before returning the fee value).
+2. B (A Singleton restricts instantiation to one object. Even though getInstance() is called twice, the constructor runs only once).
+3. A (The .equalsIgnoreCase() method within the Factory safely handles the lowercase "faculty" string and returns the correct FacultyMember object).
+4. C ("ALUMNI" is not programmed into the Factory method, causing it to return null. The check prevents a crash and prints the custom invalid message).
+5. B (The objects are successfully created, but m2.showPrivileges() is called before m1, causing the student notification to print first).
+6. B (David's App is registered as an observer and therefore successfully intercepts the broadcasted book alert).
+7. C (The admin is registered after the maintenance alert is sent, so it only receives the second notification regarding new books).
+8. A (Emma is removed from the observer list before the overdue alert is triggered, leaving only the Admin Console active to receive it).
+9. C (The controller prints the initial view, but after the underlying copies value is modified to 5, .updateView() is never called again to display it).
+10. A (The copies are modified and printed twice in a row, successfully reflecting the data changes both times).
+    </script>
+
     <script>
         let currentAssessment = 1;
-        let assessments = { 1: null, 2: null };
+        let assessments = { 1: null, 2: null, 3: null };
         let userAnswers = {};
 
         function parseMarkdown(rawText) {
@@ -947,6 +1262,7 @@ D) (Nothing is printed)
         function init() {
             assessments[1] = parseMarkdown(document.getElementById('raw-a1').textContent);
             assessments[2] = parseMarkdown(document.getElementById('raw-a2').textContent);
+            assessments[3] = parseMarkdown(document.getElementById('raw-a3').textContent);
             renderAssessment(currentAssessment);
         }
 
