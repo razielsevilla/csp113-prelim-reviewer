@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +19,7 @@
             --wrong: #ef4444;
             --glass-border: rgba(255, 255, 255, 0.1);
         }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
@@ -26,12 +28,14 @@
             padding: 2rem;
             min-height: 100vh;
             background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 400px),
-                              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent 400px);
+                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent 400px);
         }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
         }
+
         .glass-panel {
             background: var(--surface);
             backdrop-filter: blur(12px);
@@ -42,8 +46,22 @@
             margin-bottom: 2rem;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
         }
-        h1, h2, h3 { margin-top: 0; }
-        h1 { font-size: 2.5rem; text-align: center; margin-bottom: 2rem; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; color: transparent; }
+
+        h1,
+        h2,
+        h3 {
+            margin-top: 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
         button {
             background: var(--primary);
             color: white;
@@ -55,16 +73,55 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        button:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: rgba(59, 130, 246, 0.1); }
-        
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
         /* Question Styles */
-        .question { margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 2rem; }
-        .question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        pre { background: #1e1e1e; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #333; font-family: 'Courier New', Courier, monospace; }
-        code { color: #d4d4d4; }
-        .options { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+        .question {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 2rem;
+        }
+
+        .question:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        pre {
+            background: #1e1e1e;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid #333;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        code {
+            color: #d4d4d4;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
         .option {
             background: rgba(255, 255, 255, 0.05);
             padding: 1rem;
@@ -75,28 +132,95 @@
             display: flex;
             align-items: center;
         }
-        .option:hover { background: rgba(255, 255, 255, 0.1); }
-        .option.selected { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
-        .option input { margin-right: 1rem; cursor: pointer; }
-        
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .option.selected {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .option input {
+            margin-right: 1rem;
+            cursor: pointer;
+        }
+
         /* Results Styles */
-        .result-panel { display: none; }
-        .score-display { text-align: center; font-size: 3rem; font-weight: bold; margin: 1rem 0; color: var(--primary); }
-        .feedback { margin-top: 1rem; padding: 1rem; border-radius: 0.5rem; font-size: 0.95rem; display: none; }
-        .feedback.wrong { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
-        .feedback.correct { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; }
-        .nav-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; }
-        .tab { padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; border: 1px solid var(--glass-border); background: var(--surface); color: var(--text-muted); font-weight: 600; transition: all 0.2s; }
-        .tab.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .tab:hover:not(.active) { background: var(--surface-hover); color: var(--text); }
-        
-        .codebase-panel { max-height: 400px; overflow-y: auto; margin-bottom: 2rem; }
+        .result-panel {
+            display: none;
+        }
+
+        .score-display {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            color: var(--primary);
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .feedback.wrong {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .feedback.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #6ee7b7;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+            background: var(--surface);
+            color: var(--text-muted);
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tab:hover:not(.active) {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        .codebase-panel {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Practice Assessments</h1>
-        
+
         <div class="nav-tabs" id="assessmentTabs">
             <div class="tab active" onclick="switchAssessment(1)">Assessment 1 (Module 1-4)</div>
             <div class="tab" onclick="switchAssessment(2)">Assessment 2 (Food Delivery)</div>
@@ -107,13 +231,14 @@
                 <h3>Unified Base Code</h3>
                 <pre><code id="base-code-display">Loading...</code></pre>
             </div>
-            
+
             <div class="glass-panel" id="questions-display">
                 <!-- Questions injected here -->
             </div>
-            
+
             <div style="text-align: center; margin-bottom: 3rem;">
-                <button onclick="submitQuiz()" id="submit-btn" style="font-size: 1.25rem; padding: 1rem 3rem;">Submit Answers</button>
+                <button onclick="submitQuiz()" id="submit-btn" style="font-size: 1.25rem; padding: 1rem 3rem;">Submit
+                    Answers</button>
             </div>
         </div>
 
@@ -776,7 +901,7 @@ D) (Nothing is printed)
 
         function parseMarkdown(rawText) {
             const data = { codebase: '', questions: [] };
-            
+
             // Extract codebase
             const codeMatch = rawText.match(/### The Unified Base Code.*?\n`java\n([\s\S]*?)\n`\n/);
             if (codeMatch) data.codebase = codeMatch[1].trim();
@@ -788,7 +913,7 @@ D) (Nothing is printed)
                 const id = parseInt(match[1]);
                 const code = match[2].trim();
                 const optionsRaw = match[3].trim();
-                
+
                 const options = {};
                 const optPattern = /([A-D])\) (.*?)(?=[A-D]\)|$)/g;
                 const normalizedOptions = optionsRaw.replace(/\n/g, ' ');
@@ -796,7 +921,7 @@ D) (Nothing is printed)
                 while ((optMatch = optPattern.exec(normalizedOptions)) !== null) {
                     options[optMatch[1]] = optMatch[2].trim();
                 }
-                
+
                 data.questions.push({ id, code, options, answer: '', explanation: '' });
             }
 
@@ -840,66 +965,68 @@ D) (Nothing is printed)
         function renderAssessment(num) {
             const data = assessments[num];
             document.getElementById('base-code-display').textContent = data.codebase;
-            
+
             const qContainer = document.getElementById('questions-display');
             qContainer.innerHTML = '';
-            
+
             data.questions.forEach((q, idx) => {
                 const qEl = document.createElement('div');
                 qEl.className = 'question';
                 qEl.id = 'question-' + q.id;
-                
+
                 let optionsHtml = '';
                 for (const [letter, text] of Object.entries(q.options)) {
-                    optionsHtml += \
-                        <label class="option" onclick="selectOption(\, '\')">
-                            <input type="radio" name="q\" value="\">
-                            <span><b>\)</b> \</span>
+                    optionsHtml += `
+                        <label class="option" onclick="selectOption(${q.id}, '${letter}')">
+                            <input type="radio" name="q${q.id}" value="${letter}">
+                            <span><b>${letter})</b> ${escapeHtml(text)}</span>
                         </label>
-                    \;
+                    `;
                 }
-                
-                qEl.innerHTML = \
-                    <h3>Question \</h3>
-                    <pre><code>\</code></pre>
-                    <div class="options">\</div>
-                    <div class="feedback" id="feedback-\"></div>
-                \;
+
+                qEl.innerHTML = `
+                    <div>
+                        <h3>Question ${idx + 1}</h3>
+                        <pre><code>${escapeHtml(q.code)}</code></pre>
+                        <div class="options">${optionsHtml}</div>
+                        <div class="feedback" id="feedback-${q.id}"></div>
+                    </div>
+                `;
                 qContainer.appendChild(qEl);
             });
-            
+
             window.scrollTo(0, 0);
         }
 
         function escapeHtml(unsafe) {
             return unsafe
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
         function selectOption(qId, letter) {
             userAnswers[qId] = letter;
             const qEl = document.getElementById('question-' + qId);
             qEl.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
-            qEl.querySelector(\input[value="\"]\).closest('.option').classList.add('selected');
+            qEl.querySelector(`input[value="${letter}"]`).closest('.option').classList.add('selected');
         }
 
         function submitQuiz() {
             const data = assessments[currentAssessment];
             let score = 0;
-            
+
             if (Object.keys(userAnswers).length < data.questions.length) {
-                if(!confirm("You haven't answered all questions. Submit anyway?")) return;
+                if (!confirm("You haven't answered all questions. Submit anyway?")) return;
             }
-            
+
             data.questions.forEach(q => {
                 const fb = document.getElementById('feedback-' + q.id);
                 fb.style.display = 'block';
                 fb.className = 'feedback';
-                
+
                 const selected = userAnswers[q.id];
                 if (selected === q.answer) {
                     score++;
@@ -914,17 +1041,17 @@ D) (Nothing is printed)
                     fb.innerHTML = '<strong>Unanswered.</strong>';
                 }
             });
-            
+
             document.getElementById('quiz-container').style.display = 'none';
             document.getElementById('result-panel').style.display = 'block';
-            document.getElementById('score-text').textContent = \\/\\;
-            
+            document.getElementById('score-text').textContent = `${score} / ${data.questions.length}`;
+
             let summaryHtml = '<h3>Summary</h3><ul>';
             data.questions.forEach(q => {
                 const isCorrect = userAnswers[q.id] === q.answer;
-                summaryHtml += \<li style="color: \; margin-bottom: 0.5rem;">
-                    Question \: \
-                </li>\;
+                summaryHtml += `<li style="color: ${isCorrect ? 'green' : 'red'}; margin-bottom: 0.5rem;">
+                    Question ${q.id}: ${isCorrect ? 'Correct' : 'Incorrect'}
+                </li>`;
             });
             summaryHtml += '</ul>';
             document.getElementById('result-summary').innerHTML = summaryHtml;
@@ -943,11 +1070,12 @@ D) (Nothing is printed)
             document.getElementById('result-panel').style.display = 'none';
             document.getElementById('quiz-container').style.display = 'block';
             document.getElementById('submit-btn').style.display = 'none';
-            
+
             document.querySelectorAll('input[type="radio"]').forEach(el => el.disabled = true);
         }
 
         window.onload = init;
     </script>
 </body>
+
 </html>
