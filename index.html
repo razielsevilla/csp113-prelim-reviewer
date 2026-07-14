@@ -903,11 +903,11 @@ D) (Nothing is printed)
             const data = { codebase: '', questions: [] };
 
             // Extract codebase
-            const codeMatch = rawText.match(/### The Unified Base Code.*?\n`java\n([\s\S]*?)\n`\n/);
+            const codeMatch = rawText.match(/### The Unified Base Code.*?\n```java\n([\s\S]*?)\n```\n/);
             if (codeMatch) data.codebase = codeMatch[1].trim();
 
             // Extract questions
-            const qPattern = /\*\*Question (\d+)\*\*\n`java\n([\s\S]*?)\n`\n([A-D]\)[\s\S]*?)(?=\*\*Question|\*\*\* ### Answer Key)/g;
+            const qPattern = /\*\*Question (\d+)\*\*\n```java\n([\s\S]*?)\n```\n([A-D]\)[\s\S]*?)(?=\*\*Question|\*\*\*\s*### Answer Key)/g;
             let match;
             while ((match = qPattern.exec(rawText)) !== null) {
                 const id = parseInt(match[1]);
