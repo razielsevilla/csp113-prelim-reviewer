@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Assessments</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: rgba(30, 41, 59, 0.7);
+            --surface-hover: rgba(51, 65, 85, 0.8);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --correct: #10b981;
+            --wrong: #ef4444;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 400px),
+                              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1), transparent 400px);
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .glass-panel {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        h1, h2, h3 { margin-top: 0; }
+        h1 { font-size: 2.5rem; text-align: center; margin-bottom: 2rem; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; color: transparent; }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: rgba(59, 130, 246, 0.1); }
+        
+        /* Question Styles */
+        .question { margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 2rem; }
+        .question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        pre { background: #1e1e1e; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #333; font-family: 'Courier New', Courier, monospace; }
+        code { color: #d4d4d4; }
+        .options { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+        .option {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .option:hover { background: rgba(255, 255, 255, 0.1); }
+        .option.selected { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
+        .option input { margin-right: 1rem; cursor: pointer; }
+        
+        /* Results Styles */
+        .result-panel { display: none; }
+        .score-display { text-align: center; font-size: 3rem; font-weight: bold; margin: 1rem 0; color: var(--primary); }
+        .feedback { margin-top: 1rem; padding: 1rem; border-radius: 0.5rem; font-size: 0.95rem; display: none; }
+        .feedback.wrong { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
+        .feedback.correct { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; }
+        .nav-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; }
+        .tab { padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; border: 1px solid var(--glass-border); background: var(--surface); color: var(--text-muted); font-weight: 600; transition: all 0.2s; }
+        .tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .tab:hover:not(.active) { background: var(--surface-hover); color: var(--text); }
+        
+        .codebase-panel { max-height: 400px; overflow-y: auto; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Practice Assessments</h1>
+        
+        <div class="nav-tabs" id="assessmentTabs">
+            <div class="tab active" onclick="switchAssessment(1)">Assessment 1 (Module 1-4)</div>
+            <div class="tab" onclick="switchAssessment(2)">Assessment 2 (Food Delivery)</div>
+        </div>
+
+        <div id="quiz-container">
+            <div class="glass-panel codebase-panel">
+                <h3>Unified Base Code</h3>
+                <pre><code id="base-code-display">Loading...</code></pre>
+            </div>
+            
+            <div class="glass-panel" id="questions-display">
+                <!-- Questions injected here -->
+            </div>
+            
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <button onclick="submitQuiz()" id="submit-btn" style="font-size: 1.25rem; padding: 1rem 3rem;">Submit Answers</button>
+            </div>
+        </div>
+
+        <div class="glass-panel result-panel" id="result-panel">
+            <h2>Quiz Results</h2>
+            <div class="score-display">Score: <span id="score-text">0/10</span></div>
+            <div id="result-summary"></div>
+            <div style="text-align: center; margin-top: 2rem;">
+                <button onclick="retryQuiz()" class="btn-outline">Retry Quiz</button>
+                <button onclick="viewAnswers()" style="margin-left: 1rem;">Review Explanations</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/markdown" id="raw-a1">Here is the complete practice assessment structured exactly as you requested! Because you need a very specific layout (a unified codebase at the top followed by targeted tracing questions), generating this directly here in our chat is the best way to match your professor's exact format. Below is the Unified Base Code, which combines the exact implementations of the Singleton, Factory, Observer, and MVC patterns from your module 1-4. You should assume this entire block of code is already compiled and running correctly.
+
+***
+### The Unified Base Code
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+// ==========================================
+// 1. SINGLETON PATTERN
+// ==========================================
+class ConfigurationManager {
+    private ConfigurationManager() {
+        System.out.println("Configuration Manager Initialized");
+    }
+    private static class SingletonHelper {
+        private static final ConfigurationManager INSTANCE = new ConfigurationManager();
+    }
+    public static ConfigurationManager getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+    public String getApplicationName() {
+        return "Student Management System";
+    }
+    public String getVersion() {
+        return "Version 1.0";
+    }
+    public String getDatabaseURL() {
+        return "jdbc:mysql://localhost:3306/studentdb";
+    }
+}
+
+// ==========================================
+// 2. FACTORY PATTERN
+// ==========================================
+interface Notification {
+    void send();
+}
+class EmailNotification implements Notification {
+    public void send() {
+        System.out.println("Sending Email Notification...");
+    }
+}
+class SMSNotification implements Notification {
+    public void send() {
+        System.out.println("Sending SMS Notification...");
+    }
+}
+class PushNotification implements Notification {
+    public void send() {
+        System.out.println("Sending Push Notification...");
+    }
+}
+class NotificationFactory {
+    public static Notification createNotification(String type) {
+        if (type.equalsIgnoreCase("EMAIL")) return new EmailNotification();
+        if (type.equalsIgnoreCase("SMS")) return new SMSNotification();
+        if (type.equalsIgnoreCase("PUSH")) return new PushNotification();
+        return null;
+    }
+}
+
+// ==========================================
+// 3. OBSERVER PATTERN
+// ==========================================
+interface Observer {
+    void update(String message);
+}
+interface Subject {
+    void registerObserver(Observer o);
+    void removeObserver(Observer o);
+    void notifyObservers();
+}
+class NewsAgency implements Subject {
+    private List observers = new ArrayList<>();
+    private String news;
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update(news);
+        }
+    }
+    public void setNews(String news) {
+        this.news = news;
+        notifyObservers();
+    }
+}
+class MobileUser implements Observer {
+    private String name;
+    public MobileUser(String name) {
+        this.name = name;
+    }
+    public void update(String message) {
+        System.out.println(name + " received on mobile: " + message);
+    }
+}
+class TVChannel implements Observer {
+    private String channelName;
+    public TVChannel(String channelName) {
+        this.channelName = channelName;
+    }
+    public void update(String message) {
+        System.out.println(channelName + " broadcasts: " + message);
+    }
+}
+
+// ==========================================
+// 4. MODEL-VIEW-CONTROLLER (MVC) PATTERN
+// ==========================================
+class Student {
+    private String name;
+    private int age;
+    public Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    public String getName() {
+        return name;
+    }
+    public int getAge() {
+        return age;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setAge(int age) {
+        this.age = age;
+    }
+}
+class StudentView {
+    public void displayStudentDetails(String name, int age) {
+        System.out.println("Student Details:");
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+    }
+}
+class StudentController {
+    private Student model;
+    private StudentView view;
+    public StudentController(Student model, StudentView view) {
+        this.model = model;
+        this.view = view;
+    }
+    public void setStudentName(String name) {
+        model.setName(name);
+    }
+    public void setStudentAge(int age) {
+        model.setAge(age);
+    }
+    public void updateView() {
+        view.displayStudentDetails(model.getName(), model.getAge());
+    }
+}
+```
+
+***
+### Tracing Assessment: 10 Questions
+Instructions: For each main method below, determine the exact output printed to the console based on the unified codebase above.
+
+**Question 1**
+```java
+public static void main(String[] args) {
+    ConfigurationManager c1 = ConfigurationManager.getInstance();
+    System.out.println("App: " + c1.getApplicationName());
+}
+```
+A) App: Student Management System
+B) Configuration Manager Initialized App: Student Management System
+C) Configuration Manager Initialized
+D) Compilation Error
+
+**Question 2**
+```java
+public static void main(String[] args) {
+    ConfigurationManager c1 = ConfigurationManager.getInstance();
+    ConfigurationManager c2 = ConfigurationManager.getInstance();
+    System.out.println("Same Object: " + (c1 == c2));
+}
+```
+A) Configuration Manager Initialized Same Object: true
+B) Configuration Manager Initialized Configuration Manager Initialized Same Object: true
+C) Same Object: true
+D) Configuration Manager Initialized Same Object: false
+
+**Question 3**
+```java
+public static void main(String[] args) {
+    Notification n = NotificationFactory.createNotification("sms");
+    n.send();
+}
+```
+A) NullPointerException
+B) Sending SMS Notification...
+C) Sending Email Notification...
+D) Compilation Error
+
+**Question 4**
+```java
+public static void main(String[] args) {
+    Notification n1 = NotificationFactory.createNotification("EMAIL");
+    Notification n2 = NotificationFactory.createNotification("push");
+    n2.send();
+    n1.send();
+}
+```
+A) Sending Push Notification... Sending Email Notification...
+B) Sending Email Notification... Sending Push Notification...
+C) Sending PUSH Notification... Sending EMAIL Notification...
+D) NullPointerException
+
+**Question 5**
+```java
+public static void main(String[] args) {
+    Notification n = NotificationFactory.createNotification("FAX");
+    if(n == null) {
+        System.out.println("Invalid Notification Type");
+    } else {
+        n.send();
+    }
+}
+```
+A) Sending FAX Notification...
+B) NullPointerException
+C) Invalid Notification Type
+D) Compilation Error
+
+**Question 6**
+```java
+public static void main(String[] args) {
+    NewsAgency agency = new NewsAgency();
+    Observer tv = new TVChannel("News24");
+    agency.registerObserver(tv);
+    agency.setNews("Breaking News!");
+    agency.removeObserver(tv);
+    agency.setNews("More News!");
+}
+```
+A) News24 broadcasts: Breaking News! News24 broadcasts: More News!
+B) News24 broadcasts: Breaking News!
+C) News24 broadcasts: More News!
+D) Breaking News!
+
+**Question 7**
+```java
+public static void main(String[] args) {
+    NewsAgency agency = new NewsAgency();
+    Observer user1 = new MobileUser("Mark");
+    agency.setNews("No observers yet!");
+    agency.registerObserver(user1);
+    agency.setNews("Hello Mark!");
+}
+```
+A) Mark received on mobile: No observers yet! Mark received on mobile: Hello Mark!
+B) Mark received on mobile: Hello Mark!
+C) Hello Mark!
+D) NullPointerException
+
+**Question 8**
+```java
+public static void main(String[] args) {
+    Student model = new Student("Alice", 20);
+    StudentView view = new StudentView();
+    StudentController ctrl = new StudentController(model, view);
+    ctrl.setStudentAge(21);
+    ctrl.setStudentName("Alicia");
+    ctrl.updateView();
+}
+```
+A) Student Details: Name: Alice Age: 20
+B) Student Details: Name: Alicia Age: 21
+C) Name: Alicia Age: 21
+D) Student Details: Name: Alice Age: 21
+
+**Question 9**
+```java
+public static void main(String[] args) {
+    Student model = new Student("Tom", 22);
+    StudentView view = new StudentView();
+    StudentController ctrl = new StudentController(model, view);
+    ctrl.updateView();
+    ctrl.setStudentAge(23);
+}
+```
+A) Student Details: Name: Tom Age: 23
+B) Student Details: Name: Tom Age: 22 Student Details: Name: Tom Age: 23
+C) Student Details: Name: Tom Age: 22
+D) Name: Tom Age: 22
+
+**Question 10**
+```java
+public static void main(String[] args) {
+    ConfigurationManager config = ConfigurationManager.getInstance();
+    System.out.println(config.getVersion());
+    ConfigurationManager config2 = ConfigurationManager.getInstance();
+    System.out.println(config2.getVersion());
+}
+```
+A) Configuration Manager Initialized Version 1.0 Version 1.0
+B) Configuration Manager Initialized Version 1.0 Configuration Manager Initialized Version 1.0
+C) Version 1.0 Version 1.0
+D) Configuration Manager Initialized Version 1.0
+
+***
+### Answer Key (Don't peek until you're done!)
+1. B (The private constructor is called upon the first instance creation, printing the init message before returning the app name 1, 5, 6)
+2. A (Singleton restricts to only ONE instance, so the constructor is only called once 6)
+3. B (The Factory uses .equalsIgnoreCase(), so lowercase "sms" still returns a valid object 7)
+4. A (Order of .send() execution dictates output 2, 7, 8)
+5. C (The Factory defaults to returning null if the string isn't matched 7)
+6. B (The observer is removed before the second piece of news is set 9-11)
+7. B ("No observers yet!" is set before Mark is registered, so he never receives it 9)
+8. B (The controller updates the underlying model data BEFORE .updateView() is called to print to the screen 12-14)
+9. C (The age is updated in the model, but .updateView() is never called a second time to print the change 12-14)
+10. A (Even with two getInstance() calls, the initialization print statement only fires once 6, 15)
+
+Good luck with your practice! Let me know if you want to break down the tracing logic for any of these.
+    </script>
+    <script type="text/markdown" id="raw-a2">Here is another complete practice assessment for you. For this version, I have applied the code structures from your module to a brand new context: an Online Food Ordering Platform 1-20. Your module's assessment task specifically mentions using the Factory Pattern for payment processing and the Observer Pattern for real-time order tracking 20, so this codebase is designed to reflect that exact scenario!
+
+***
+### The Unified Base Code: Food Ordering Platform
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+// ==========================================
+// 1. SINGLETON PATTERN
+// ==========================================
+class AppConfigManager {
+    private AppConfigManager() {
+        System.out.println("Food App Config Initialized");
+    }
+    private static class SingletonHelper {
+        private static final AppConfigManager INSTANCE = new AppConfigManager();
+    }
+    public static AppConfigManager getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+    public String getAppName() {
+        return "FoodDeliveryPro";
+    }
+    public String getBaseDeliveryFee() {
+        return "50.00";
+    }
+}
+
+// ==========================================
+// 2. FACTORY PATTERN
+// ==========================================
+interface Payment {
+    void processPayment();
+}
+class CreditCardPayment implements Payment {
+    public void processPayment() {
+        System.out.println("Processing Credit Card Payment...");
+    }
+}
+class EWalletPayment implements Payment {
+    public void processPayment() {
+        System.out.println("Processing E-Wallet Payment...");
+    }
+}
+class CashOnDelivery implements Payment {
+    public void processPayment() {
+        System.out.println("Preparing for Cash on Delivery...");
+    }
+}
+class PaymentFactory {
+    public static Payment createPayment(String type) {
+        if (type.equalsIgnoreCase("CREDIT_CARD")) return new CreditCardPayment();
+        if (type.equalsIgnoreCase("EWALLET")) return new EWalletPayment();
+        if (type.equalsIgnoreCase("COD")) return new CashOnDelivery();
+        return null;
+    }
+}
+
+// ==========================================
+// 3. OBSERVER PATTERN
+// ==========================================
+interface OrderObserver {
+    void update(String status);
+}
+interface OrderSubject {
+    void registerObserver(OrderObserver o);
+    void removeObserver(OrderObserver o);
+    void notifyObservers();
+}
+class OrderTracker implements OrderSubject {
+    private List observers = new ArrayList<>();
+    private String orderStatus;
+    public void registerObserver(OrderObserver o) {
+        observers.add(o);
+    }
+    public void removeObserver(OrderObserver o) {
+        observers.remove(o);
+    }
+    public void notifyObservers() {
+        for (OrderObserver observer : observers) {
+            observer.update(orderStatus);
+        }
+    }
+    public void setStatus(String status) {
+        this.orderStatus = status;
+        notifyObservers();
+    }
+}
+class CustomerApp implements OrderObserver {
+    private String customerName;
+    public CustomerApp(String name) {
+        this.customerName = name;
+    }
+    public void update(String status) {
+        System.out.println(customerName + "'s App: Order is " + status);
+    }
+}
+class RestaurantDashboard implements OrderObserver {
+    private String restoName;
+    public RestaurantDashboard(String name) {
+        this.restoName = name;
+    }
+    public void update(String status) {
+        System.out.println(restoName + " Dashboard: Customer order is " + status);
+    }
+}
+
+// ==========================================
+// 4. MODEL-VIEW-CONTROLLER (MVC) PATTERN
+// ==========================================
+class FoodItem {
+    private String name;
+    private double price;
+    public FoodItem(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+    public String getName() {
+        return name;
+    }
+    public double getPrice() {
+        return price;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setPrice(double price) {
+        this.price = price;
+    }
+}
+class FoodItemView {
+    public void printItem(String name, double price) {
+        System.out.println("Menu Item: " + name + " | Price: P" + price);
+    }
+}
+class FoodItemController {
+    private FoodItem model;
+    private FoodItemView view;
+    public FoodItemController(FoodItem model, FoodItemView view) {
+        this.model = model;
+        this.view = view;
+    }
+    public void setItemName(String name) {
+        model.setName(name);
+    }
+    public void setItemPrice(double price) {
+        model.setPrice(price);
+    }
+    public void updateView() {
+        view.printItem(model.getName(), model.getPrice());
+    }
+}
+```
+
+***
+### Tracing Assessment: 10 Questions
+Instructions: For each main method below, determine the exact output printed to the console based on the unified codebase above.
+
+**Question 1**
+```java
+public static void main(String[] args) {
+    AppConfigManager config = AppConfigManager.getInstance();
+    System.out.println("Fee: " + config.getBaseDeliveryFee());
+}
+```
+A) Fee: 50.00
+B) Food App Config Initialized Fee: 50.00
+C) Food App Config Initialized
+D) Compilation Error
+
+**Question 2**
+```java
+public static void main(String[] args) {
+    AppConfigManager config1 = AppConfigManager.getInstance();
+    AppConfigManager config2 = AppConfigManager.getInstance();
+    System.out.println(config1.getAppName());
+}
+```
+A) Food App Config Initialized FoodDeliveryPro
+B) Food App Config Initialized Food App Config Initialized FoodDeliveryPro
+C) FoodDeliveryPro
+D) Food App Config Initialized
+
+**Question 3**
+```java
+public static void main(String[] args) {
+    Payment p1 = PaymentFactory.createPayment("eWallet");
+    p1.processPayment();
+}
+```
+A) Processing E-Wallet Payment...
+B) NullPointerException
+C) Processing Credit Card Payment...
+D) Preparing for Cash on Delivery...
+
+**Question 4**
+```java
+public static void main(String[] args) {
+    Payment p = PaymentFactory.createPayment("DEBIT_CARD");
+    if(p != null) {
+        p.processPayment();
+    } else {
+        System.out.println("Payment Method Unavailable");
+    }
+}
+```
+A) NullPointerException
+B) Processing Credit Card Payment...
+C) Payment Method Unavailable
+D) Compilation Error
+
+**Question 5**
+```java
+public static void main(String[] args) {
+    Payment p1 = PaymentFactory.createPayment("cod");
+    Payment p2 = PaymentFactory.createPayment("CREDIT_CARD");
+    p2.processPayment();
+    p1.processPayment();
+}
+```
+A) Preparing for Cash on Delivery... Processing Credit Card Payment...
+B) Processing Credit Card Payment... Preparing for Cash on Delivery...
+C) NullPointerException
+D) Processing cod Payment... Processing CREDIT_CARD Payment...
+
+**Question 6**
+```java
+public static void main(String[] args) {
+    OrderTracker tracker = new OrderTracker();
+    OrderObserver customer = new CustomerApp("Sarah");
+    OrderObserver resto = new RestaurantDashboard("Burger Joint");
+    tracker.registerObserver(customer);
+    tracker.registerObserver(resto);
+    tracker.setStatus("Preparing");
+}
+```
+A) Sarah's App: Order is Preparing Burger Joint Dashboard: Customer order is Preparing
+B) Preparing
+C) Burger Joint Dashboard: Customer order is Preparing Sarah's App: Order is Preparing
+D) Sarah's App: Order is Preparing
+
+**Question 7**
+```java
+public static void main(String[] args) {
+    OrderTracker tracker = new OrderTracker();
+    OrderObserver customer = new CustomerApp("John");
+    tracker.setStatus("Received");
+    tracker.registerObserver(customer);
+    tracker.setStatus("Out for Delivery");
+}
+```
+A) John's App: Order is Received John's App: Order is Out for Delivery
+B) John's App: Order is Out for Delivery
+C) John's App: Order is Received
+D) NullPointerException
+
+**Question 8**
+```java
+public static void main(String[] args) {
+    OrderTracker tracker = new OrderTracker();
+    OrderObserver resto = new RestaurantDashboard("Pizza Hut");
+    OrderObserver customer = new CustomerApp("Mike");
+    tracker.registerObserver(resto);
+    tracker.registerObserver(customer);
+    tracker.removeObserver(resto);
+    tracker.setStatus("Delivered");
+}
+```
+A) Pizza Hut Dashboard: Customer order is Delivered Mike's App: Order is Delivered
+B) Pizza Hut Dashboard: Customer order is Delivered
+C) Mike's App: Order is Delivered
+D) Compilation Error
+
+**Question 9**
+```java
+public static void main(String[] args) {
+    FoodItem item = new FoodItem("Fries", 60.00);
+    FoodItemView view = new FoodItemView();
+    FoodItemController ctrl = new FoodItemController(item, view);
+    ctrl.updateView();
+    ctrl.setItemPrice(75.00);
+    ctrl.updateView();
+}
+```
+A) Menu Item: Fries | Price: P60.0 Menu Item: Fries | Price: P75.0
+B) Menu Item: Fries | Price: P75.0
+C) Menu Item: Fries | Price: P60.00 Menu Item: Fries | Price: P75.00
+D) Menu Item: Fries | Price: P75.0 Menu Item: Fries | Price: P75.0
+
+**Question 10**
+```java
+public static void main(String[] args) {
+    FoodItem item = new FoodItem("Burger", 150.0);
+    FoodItemView view = new FoodItemView();
+    FoodItemController ctrl = new FoodItemController(item, view);
+    ctrl.setItemName("Cheeseburger");
+    ctrl.setItemPrice(180.0);
+}
+```
+A) Menu Item: Burger | Price: P150.0
+B) Menu Item: Cheeseburger | Price: P180.0
+C) NullPointerException
+D) (Nothing is printed)
+
+***
+### Answer Key
+1. B (The private constructor of a Singleton runs the very first time getInstance() is called, printing the initialization message before the fee is requested 2-4.)
+2. A (Even though getInstance() is called twice, the Singleton guarantees the instance is only created once, so "Food App Config Initialized" only prints a single time 2-4.)
+3. A (The Factory Method uses .equalsIgnoreCase(), so the mixed case "eWallet" successfully instantiates and returns an EWalletPayment object 8, 9.)
+4. C ("DEBIT_CARD" is not a defined type in the Factory, so it returns null. The if statement catches the null and prints the fallback message 8, 9.)
+5. B (Objects are created, but .processPayment() is called on p2 first, meaning the Credit Card message prints before the COD message 8, 9.)
+6. A (Both observers are registered before the status is updated, so both receive the "Preparing" message in the order they were added 13-15.)
+7. B ("Received" is set before the customer is registered to the Subject, so the customer only gets notified about "Out for Delivery" 13-15.)
+8. C (The restaurant is registered but then immediately removed via removeObserver() before the status is updated, leaving only Mike to receive the notification 13-15.)
+9. A (The Controller prints the view, updates the model's price data, and then correctly calls .updateView() a second time to show the updated data 18, 19, 21. Note: Java prints .0 for doubles unless specifically formatted otherwise).
+10. D (The controller updates the underlying model data, but .updateView() is never explicitly called in the main method, so nothing is sent to the console 18, 19, 21.)
+    </script>
+
+    <script>
+        let currentAssessment = 1;
+        let assessments = { 1: null, 2: null };
+        let userAnswers = {};
+
+        function parseMarkdown(rawText) {
+            const data = { codebase: '', questions: [] };
+            
+            // Extract codebase
+            const codeMatch = rawText.match(/### The Unified Base Code.*?\n`java\n([\s\S]*?)\n`\n/);
+            if (codeMatch) data.codebase = codeMatch[1].trim();
+
+            // Extract questions
+            const qPattern = /\*\*Question (\d+)\*\*\n`java\n([\s\S]*?)\n`\n([A-D]\)[\s\S]*?)(?=\*\*Question|\*\*\* ### Answer Key)/g;
+            let match;
+            while ((match = qPattern.exec(rawText)) !== null) {
+                const id = parseInt(match[1]);
+                const code = match[2].trim();
+                const optionsRaw = match[3].trim();
+                
+                const options = {};
+                const optPattern = /([A-D])\) (.*?)(?=[A-D]\)|$)/g;
+                const normalizedOptions = optionsRaw.replace(/\n/g, ' ');
+                let optMatch;
+                while ((optMatch = optPattern.exec(normalizedOptions)) !== null) {
+                    options[optMatch[1]] = optMatch[2].trim();
+                }
+                
+                data.questions.push({ id, code, options, answer: '', explanation: '' });
+            }
+
+            // Extract answers
+            const ansMatch = rawText.match(/### Answer Key[\s\S]*?\n(1\.[\s\S]*?)$/);
+            if (ansMatch) {
+                const lines = ansMatch[1].split('\n');
+                lines.forEach(line => {
+                    const m = line.trim().match(/^(\d+)\.\s+([A-D])\s+\((.*?)\)$/);
+                    if (m) {
+                        const qId = parseInt(m[1]);
+                        const q = data.questions.find(q => q.id === qId);
+                        if (q) {
+                            q.answer = m[2];
+                            q.explanation = m[3];
+                        }
+                    }
+                });
+            }
+            return data;
+        }
+
+        function init() {
+            assessments[1] = parseMarkdown(document.getElementById('raw-a1').textContent);
+            assessments[2] = parseMarkdown(document.getElementById('raw-a2').textContent);
+            renderAssessment(currentAssessment);
+        }
+
+        function switchAssessment(num) {
+            currentAssessment = num;
+            document.querySelectorAll('.tab').forEach((el, idx) => {
+                el.classList.toggle('active', idx + 1 === num);
+            });
+            userAnswers = {};
+            document.getElementById('result-panel').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            renderAssessment(num);
+        }
+
+        function renderAssessment(num) {
+            const data = assessments[num];
+            document.getElementById('base-code-display').textContent = data.codebase;
+            
+            const qContainer = document.getElementById('questions-display');
+            qContainer.innerHTML = '';
+            
+            data.questions.forEach((q, idx) => {
+                const qEl = document.createElement('div');
+                qEl.className = 'question';
+                qEl.id = 'question-' + q.id;
+                
+                let optionsHtml = '';
+                for (const [letter, text] of Object.entries(q.options)) {
+                    optionsHtml += \
+                        <label class="option" onclick="selectOption(\, '\')">
+                            <input type="radio" name="q\" value="\">
+                            <span><b>\)</b> \</span>
+                        </label>
+                    \;
+                }
+                
+                qEl.innerHTML = \
+                    <h3>Question \</h3>
+                    <pre><code>\</code></pre>
+                    <div class="options">\</div>
+                    <div class="feedback" id="feedback-\"></div>
+                \;
+                qContainer.appendChild(qEl);
+            });
+            
+            window.scrollTo(0, 0);
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        function selectOption(qId, letter) {
+            userAnswers[qId] = letter;
+            const qEl = document.getElementById('question-' + qId);
+            qEl.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+            qEl.querySelector(\input[value="\"]\).closest('.option').classList.add('selected');
+        }
+
+        function submitQuiz() {
+            const data = assessments[currentAssessment];
+            let score = 0;
+            
+            if (Object.keys(userAnswers).length < data.questions.length) {
+                if(!confirm("You haven't answered all questions. Submit anyway?")) return;
+            }
+            
+            data.questions.forEach(q => {
+                const fb = document.getElementById('feedback-' + q.id);
+                fb.style.display = 'block';
+                fb.className = 'feedback';
+                
+                const selected = userAnswers[q.id];
+                if (selected === q.answer) {
+                    score++;
+                    fb.classList.add('correct');
+                    fb.innerHTML = '<strong>Correct!</strong> ' + escapeHtml(q.explanation);
+                } else if (selected) {
+                    fb.classList.add('wrong');
+                    let expText = escapeHtml(q.explanation);
+                    fb.innerHTML = '<strong>Incorrect.</strong> Here is what happens in this code: <br>' + expText;
+                } else {
+                    fb.classList.add('wrong');
+                    fb.innerHTML = '<strong>Unanswered.</strong>';
+                }
+            });
+            
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('result-panel').style.display = 'block';
+            document.getElementById('score-text').textContent = \\/\\;
+            
+            let summaryHtml = '<h3>Summary</h3><ul>';
+            data.questions.forEach(q => {
+                const isCorrect = userAnswers[q.id] === q.answer;
+                summaryHtml += \<li style="color: \; margin-bottom: 0.5rem;">
+                    Question \: \
+                </li>\;
+            });
+            summaryHtml += '</ul>';
+            document.getElementById('result-summary').innerHTML = summaryHtml;
+            window.scrollTo(0, 0);
+        }
+
+        function retryQuiz() {
+            userAnswers = {};
+            document.getElementById('result-panel').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'inline-block';
+            renderAssessment(currentAssessment);
+        }
+
+        function viewAnswers() {
+            document.getElementById('result-panel').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'none';
+            
+            document.querySelectorAll('input[type="radio"]').forEach(el => el.disabled = true);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
